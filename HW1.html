@@ -391,6 +391,110 @@ FEV1 является следствием и назначения антиби�
 </div>
 </section>
 </section>
+<section id="задание-4" class="level1">
+<h1>Задание 4</h1>
+<p>С помощью функций пакета dagitty(adjustmentSets), или ggdag(dag_adjustment_sets, ggdag_adjustment_set), или онлайн-приложения DAGitty определите минимальный набор ковариат, необходимый для оценки общего (total) эффекта антибиотика на каждый из двух исходов.<br>
+Для переменных, которые войдут в минимальный набор, опишите, каким может быть механизм их связи с воздействием и исходом. Почему их включение в соответствующую модель является, с вашей точки зрения обязательным? Что будет с оценкой интересующего исследователей эффекта, если тот или иной показатель не будет включен в модель</p>
+<section id="antibiotics---fev1" class="level2">
+<h2 class="anchored" data-anchor-id="antibiotics---fev1">Antibiotics -&gt; FEV1</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dag_FEV1 <span class="ot">&lt;-</span> dag</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  dag_FEV1,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="st">"Antibiotics"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">"FEV1"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">effect =</span> <span class="st">"total"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{ AgeIndex, GestAge, InfSeverity, ParentAtopy, ParentEduc, WheezeHist }
+{ AgeIndex, CareSeek, GestAge, InfSeverity, ParentEduc, WheezeHist }</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggdag_adjustment_set</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  dag_FEV1,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="st">"Antibiotics"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">"FEV1"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">shadow =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">node_size =</span> <span class="dv">15</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">text_size =</span> <span class="dv">4</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">text_col =</span> <span class="st">"black"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">stylized =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_dag</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HW1_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Минимальный набор для FEV1:</strong><br>
+{ AgeIndex, GestAge, InfSeverity, ParentAtopy, ParentEduc, WheezeHist}<br>
+{ AgeIndex, CareSeek, GestAge, InfSeverity, ParentEduc, WheezeHist}</p>
+</section>
+<section id="antibiotics---asthma" class="level2">
+<h2 class="anchored" data-anchor-id="antibiotics---asthma">Antibiotics -&gt; Asthma</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dag_Asthma <span class="ot">&lt;-</span> dag</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">adjustmentSets</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  dag_Asthma,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="st">"Antibiotics"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">"Asthma"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">effect =</span> <span class="st">"total"</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{ AgeIndex, GestAge, InfSeverity, ParentAtopy, ParentEduc, WheezeHist }
+{ AgeIndex, CareSeek, GestAge, InfSeverity, ParentEduc, WheezeHist }</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggdag_adjustment_set</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  dag_Asthma,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposure =</span> <span class="st">"Antibiotics"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> <span class="st">"Asthma"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">shadow =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">node_size =</span> <span class="dv">15</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">text_size =</span> <span class="dv">4</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">text_col =</span> <span class="st">"black"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">stylized =</span> <span class="cn">TRUE</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_dag</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HW1_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Минимальные наборы для Asthma</strong>:<br>
+{ AgeIndex, GestAge, InfSeverity, ParentAtopy, ParentEduc, WheezeHist }<br>
+{ AgeIndex, CareSeek, GestAge, InfSeverity, ParentEduc, WheezeHist }</p>
+<p>Механизм связи с воздействием и исходом:<br>
+<strong>AgeIndex</strong> -<br>
+Возраст ребёнка при индексном эпизоде. Возраст может влиять на решение врача назначить АБ. Вероятно, маленьким детям АБ назначают чаще из-за того, что у них тяжелее протекает инфекция в связи с тем, что у них менее сформирована иммунная система по сравнению с более старшими детьми. Функция легких и риск астмы зависит от возраста (с возрастом объем легких меняется, а для развития астмы необходим триггер(аллерген), риск встретить которого увеличивается с возрастом). Если не учитывать возраст, это приведет к смещению из-за различий в возрасте</p>
+<p><strong>GestAge</strong> -<br>
+Гестационный возраст при рождении.<br>
+Недоношенность может приводить к большей предрасположенности к инфекциям или к их более тяжелому протеканию, поэтому АБ таким детям могут назначаться чаще. Также недоношенность может быть причиной нарушения развития легких, что приводит к нарушению их функции и может способствовать развитию астмы. Неучет может привести к смещению в сторону вреда АБ</p>
+<p><strong>InfSeverity</strong> -<br>
+Тяжесть индексной инфекции, оценённая лечащим врачом до решения о назначении АБ в соответствии со шкалой ВОЗ IMCI. Тяжесть инфекции напрямую определяет как решение о назначении АБ, так и риск нарушения функции лёгких и астмы. Важный конфаундер, без него - сильное смещение в сторону вреда АБ (дети с тяжелым протеканием инфекции чаще получают АБ и исход болезни у них более разрушительный)</p>
+<p><strong>CareSeek</strong> или <strong>ParentAtopy</strong> -<br>
+<em>ParentAtopy</em><br>
+Астма, аллергический ринит или атопический дерматит хотя бы у одного из родителей, диагностированные до рождения ребёнка. Является конфаундером. Вероятно, что здесь может сыграть генетический фактор и ребенок унаследует предрасположенность к астме и пр., что приводит к нарушению функции легких<br>
+<em>CareSeek</em>- (путь CareSeek -&gt; Antibiotics) причина только для АБ<br>
+Склонность семьи обращаться за медицинской помощью. Не является конфаундером ни для одного из исходов, поэтому выбор набора с <em>ParentAtopy</em> более предпочтителен</p>
+<p><strong>ParentEduc</strong> -<br>
+Образование основного ухаживающего за ребёнком взрослого. Образование связано с условиями жизни (н-р, курение в доме), приверженностью, доступом к медицинской помощи. Конфаундер, если его не учитывать оценка будет смещенной из-за неучета социально-экономического фактора</p>
+<p><strong>WheezeHist</strong> -<br>
+Наличие свистящего дыхания до индексного эпизода - может быть показанием для назначения АБ, может приводить к нарушению функции легких и повышает риск астмы, независимо от назначения АБ. Конфаундер, если его не учитывать оценка будет смещенной в сторону вреда АБ</p>
+</section>
+</section>
 
 </main>
 <!-- /main column -->
