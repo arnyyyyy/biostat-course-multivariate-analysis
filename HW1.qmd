@@ -289,84 +289,33 @@ draw_dag(dag_fev1, "FEV1")
 ## Antibiotics -> FEV1   
 
 ```{r}
-dag_FEV1 <- dagitty('dag {
-AgeIndex [pos="2.682,1.201"]
-Antibiotics [exposure,pos="2.738,1.879"]
-Asthma [pos="3.033,2.033"]
-CareSeek [pos="2.951,0.880"]
-FEV1 [outcome, pos="3.240,1.773"]
-GestAge [pos="2.742,1.009"]
-InfSeverity [pos="3.266,1.357"]
-Microbiome [pos="2.861,2.023"]
-ParentAtopy [pos="2.835,0.904"]
-ParentEduc [pos="3.092,0.911"]
-Referral [pos="3.158,1.974"]
-Smoke [pos="3.208,1.062"]
-WheezeHist [pos="2.677,1.610"]
-AgeIndex-> Antibiotics
-AgeIndex-> Asthma
-AgeIndex-> FEV1
-AgeIndex-> WheezeHist
-AgeIndex-> InfSeverity
-Antibiotics-> Asthma
-Antibiotics-> FEV1
-Antibiotics-> Microbiome
-Asthma-> FEV1
-Asthma-> Referral
-CareSeek-> Antibiotics
-CareSeek-> Referral
-GestAge-> Antibiotics
-GestAge-> Asthma
-GestAge-> FEV1
-GestAge-> InfSeverity
-GestAge-> WheezeHist
-InfSeverity-> Antibiotics
-InfSeverity-> Referral
-InfSeverity-> Asthma
-InfSeverity-> FEV1
-Microbiome-> Asthma
-Microbiome-> FEV1
-ParentAtopy-> Asthma
-ParentAtopy-> CareSeek
-ParentAtopy-> FEV1
-ParentAtopy-> WheezeHist
-ParentEduc-> Antibiotics
-ParentEduc-> Asthma
-ParentEduc-> CareSeek
-ParentEduc-> FEV1
-ParentEduc-> Smoke
-Smoke-> Asthma
-Smoke-> FEV1
-Smoke-> InfSeverity
-WheezeHist-> Antibiotics
-WheezeHist-> CareSeek
-WheezeHist-> Referral
-WheezeHist-> Asthma
-WheezeHist-> FEV1
-}')
+dag_FEV1 <- dag
 ```
 
 ```{r}
-adjustmentSets(dag_FEV1, 
-               exposure = "Antibiotics", 
-               outcome = "FEV1", 
-               effect = "total")
+adjustmentSets(
+  dag_FEV1,
+  exposure = "Antibiotics",
+  outcome = "FEV1",
+  effect = "total"
+)
 ```
 
 ```{r}
 #| fig-width: 15
 #| fig-height: 8
 
-
-ggdag_adjustment_set(dag_FEV1, 
-                     exposure = "Antibiotics", 
-                     outcome = "FEV1",
-                     shadow = TRUE,
-                     node_size = 15, 
-                     text_size = 4,  
-                     text_col = "black",
-                     stylized = TRUE) +
-    theme_dag() 
+ggdag_adjustment_set(
+  dag_FEV1,
+  exposure = "Antibiotics",
+  outcome = "FEV1",
+  shadow = TRUE,
+  node_size = 15,
+  text_size = 4,
+  text_col = "black",
+  stylized = TRUE
+) +
+  theme_dag()
 ```
 
 
@@ -377,84 +326,32 @@ ggdag_adjustment_set(dag_FEV1,
 ## Antibiotics -> Asthma
 
 ```{r}
-dag_Asthma <- dagitty('dag {
-AgeIndex [pos="2.682,1.201"]
-Antibiotics [exposure,pos="2.738,1.879"]
-Asthma [outcome,pos="3.033,2.033"]
-CareSeek [pos="2.951,0.880"]
-FEV1 [pos="3.240,1.773"]
-GestAge [pos="2.742,1.009"]
-InfSeverity [pos="3.266,1.357"]
-Microbiome [pos="2.861,2.023"]
-ParentAtopy [pos="2.835,0.904"]
-ParentEduc [pos="3.092,0.911"]
-Referral [pos="3.158,1.974"]
-Smoke [pos="3.208,1.062"]
-WheezeHist [pos="2.677,1.610"]
-AgeIndex-> Antibiotics
-AgeIndex-> Asthma
-AgeIndex-> FEV1
-AgeIndex-> WheezeHist
-AgeIndex-> InfSeverity
-Antibiotics-> Asthma
-Antibiotics-> FEV1
-Antibiotics-> Microbiome
-Asthma-> FEV1
-Asthma-> Referral
-CareSeek-> Antibiotics
-CareSeek-> Referral
-GestAge-> Antibiotics
-GestAge-> Asthma
-GestAge-> FEV1
-GestAge-> InfSeverity
-GestAge-> WheezeHist
-InfSeverity-> Antibiotics
-InfSeverity-> Referral
-InfSeverity-> Asthma
-InfSeverity-> FEV1
-Microbiome-> Asthma
-Microbiome-> FEV1
-ParentAtopy-> Asthma
-ParentAtopy-> CareSeek
-ParentAtopy-> FEV1
-ParentAtopy-> WheezeHist
-ParentEduc-> Antibiotics
-ParentEduc-> Asthma
-ParentEduc-> CareSeek
-ParentEduc-> FEV1
-ParentEduc-> Smoke
-Smoke-> Asthma
-Smoke-> FEV1
-Smoke-> InfSeverity
-WheezeHist-> Antibiotics
-WheezeHist-> CareSeek
-WheezeHist-> Referral
-WheezeHist-> Asthma
-WheezeHist-> FEV1
-}')
+dag_Asthma <- dag
 ```
 ```{r}
-adjustmentSets(dag_Asthma, 
-               exposure = "Antibiotics", 
-               outcome = "Asthma", 
-               effect = "total")
+adjustmentSets(
+  dag_Asthma,
+  exposure = "Antibiotics",
+  outcome = "Asthma",
+  effect = "total"
+)
 ```
 
 ```{r}
 #| fig-width: 15
 #| fig-height: 8
 
-
-ggdag_adjustment_set(dag_Asthma, 
-                     exposure = "Antibiotics", 
-                     outcome = "Asthma",
-                     shadow = TRUE,
-                     node_size = 15, 
-                     text_size = 4,  
-                     text_col = "black",
-                     stylized = TRUE) +
-    theme_dag() 
-
+ggdag_adjustment_set(
+  dag_Asthma,
+  exposure = "Antibiotics",
+  outcome = "Asthma",
+  shadow = TRUE,
+  node_size = 15,
+  text_size = 4,
+  text_col = "black",
+  stylized = TRUE
+) +
+  theme_dag()
 ```
 
 **Минимальные наборы для Asthma**:   
