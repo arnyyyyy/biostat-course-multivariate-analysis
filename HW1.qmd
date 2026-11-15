@@ -279,3 +279,209 @@ draw_dag(dag_asthma, "Asthma")
 dag_fev1 <- dag
 draw_dag(dag_fev1, "FEV1")
 ```
+
+
+# Задание 4 
+
+С помощью функций пакета dagitty(adjustmentSets), или ggdag(dag_adjustment_sets, ggdag_adjustment_set), или онлайн-приложения DAGitty определите минимальный набор ковариат, необходимый для оценки общего (total) эффекта антибиотика на каждый из двух исходов.    
+Для переменных, которые войдут в минимальный набор, опишите, каким может быть механизм их связи с воздействием и исходом. Почему их включение в соответствующую модель является, с вашей точки зрения обязательным? Что будет с оценкой интересующего исследователей эффекта, если тот или иной показатель не будет включен в модель   
+
+## Antibiotics -> FEV1   
+
+```{r}
+dag_FEV1 <- dagitty('dag {
+AgeIndex [pos="2.682,1.201"]
+Antibiotics [exposure,pos="2.738,1.879"]
+Asthma [pos="3.033,2.033"]
+CareSeek [pos="2.951,0.880"]
+FEV1 [outcome, pos="3.240,1.773"]
+GestAge [pos="2.742,1.009"]
+InfSeverity [pos="3.266,1.357"]
+Microbiome [pos="2.861,2.023"]
+ParentAtopy [pos="2.835,0.904"]
+ParentEduc [pos="3.092,0.911"]
+Referral [pos="3.158,1.974"]
+Smoke [pos="3.208,1.062"]
+WheezeHist [pos="2.677,1.610"]
+AgeIndex-> Antibiotics
+AgeIndex-> Asthma
+AgeIndex-> FEV1
+AgeIndex-> WheezeHist
+AgeIndex-> InfSeverity
+Antibiotics-> Asthma
+Antibiotics-> FEV1
+Antibiotics-> Microbiome
+Asthma-> FEV1
+Asthma-> Referral
+CareSeek-> Antibiotics
+CareSeek-> Referral
+GestAge-> Antibiotics
+GestAge-> Asthma
+GestAge-> FEV1
+GestAge-> InfSeverity
+GestAge-> WheezeHist
+InfSeverity-> Antibiotics
+InfSeverity-> Referral
+InfSeverity-> Asthma
+InfSeverity-> FEV1
+Microbiome-> Asthma
+Microbiome-> FEV1
+ParentAtopy-> Asthma
+ParentAtopy-> CareSeek
+ParentAtopy-> FEV1
+ParentAtopy-> WheezeHist
+ParentEduc-> Antibiotics
+ParentEduc-> Asthma
+ParentEduc-> CareSeek
+ParentEduc-> FEV1
+ParentEduc-> Smoke
+Smoke-> Asthma
+Smoke-> FEV1
+Smoke-> InfSeverity
+WheezeHist-> Antibiotics
+WheezeHist-> CareSeek
+WheezeHist-> Referral
+WheezeHist-> Asthma
+WheezeHist-> FEV1
+}')
+```
+
+```{r}
+adjustmentSets(dag_FEV1, 
+               exposure = "Antibiotics", 
+               outcome = "FEV1", 
+               effect = "total")
+```
+
+```{r}
+#| fig-width: 15
+#| fig-height: 8
+
+
+ggdag_adjustment_set(dag_FEV1, 
+                     exposure = "Antibiotics", 
+                     outcome = "FEV1",
+                     shadow = TRUE,
+                     node_size = 15, 
+                     text_size = 4,  
+                     text_col = "black",
+                     stylized = TRUE) +
+    theme_dag() 
+```
+
+
+**Минимальный набор для FEV1:**     
+{ AgeIndex, GestAge, InfSeverity, ParentAtopy, ParentEduc, WheezeHist}   
+{ AgeIndex, CareSeek, GestAge, InfSeverity, ParentEduc, WheezeHist}   
+
+## Antibiotics -> Asthma
+
+```{r}
+dag_Asthma <- dagitty('dag {
+AgeIndex [pos="2.682,1.201"]
+Antibiotics [exposure,pos="2.738,1.879"]
+Asthma [outcome,pos="3.033,2.033"]
+CareSeek [pos="2.951,0.880"]
+FEV1 [pos="3.240,1.773"]
+GestAge [pos="2.742,1.009"]
+InfSeverity [pos="3.266,1.357"]
+Microbiome [pos="2.861,2.023"]
+ParentAtopy [pos="2.835,0.904"]
+ParentEduc [pos="3.092,0.911"]
+Referral [pos="3.158,1.974"]
+Smoke [pos="3.208,1.062"]
+WheezeHist [pos="2.677,1.610"]
+AgeIndex-> Antibiotics
+AgeIndex-> Asthma
+AgeIndex-> FEV1
+AgeIndex-> WheezeHist
+AgeIndex-> InfSeverity
+Antibiotics-> Asthma
+Antibiotics-> FEV1
+Antibiotics-> Microbiome
+Asthma-> FEV1
+Asthma-> Referral
+CareSeek-> Antibiotics
+CareSeek-> Referral
+GestAge-> Antibiotics
+GestAge-> Asthma
+GestAge-> FEV1
+GestAge-> InfSeverity
+GestAge-> WheezeHist
+InfSeverity-> Antibiotics
+InfSeverity-> Referral
+InfSeverity-> Asthma
+InfSeverity-> FEV1
+Microbiome-> Asthma
+Microbiome-> FEV1
+ParentAtopy-> Asthma
+ParentAtopy-> CareSeek
+ParentAtopy-> FEV1
+ParentAtopy-> WheezeHist
+ParentEduc-> Antibiotics
+ParentEduc-> Asthma
+ParentEduc-> CareSeek
+ParentEduc-> FEV1
+ParentEduc-> Smoke
+Smoke-> Asthma
+Smoke-> FEV1
+Smoke-> InfSeverity
+WheezeHist-> Antibiotics
+WheezeHist-> CareSeek
+WheezeHist-> Referral
+WheezeHist-> Asthma
+WheezeHist-> FEV1
+}')
+```
+```{r}
+adjustmentSets(dag_Asthma, 
+               exposure = "Antibiotics", 
+               outcome = "Asthma", 
+               effect = "total")
+```
+
+```{r}
+#| fig-width: 15
+#| fig-height: 8
+
+
+ggdag_adjustment_set(dag_Asthma, 
+                     exposure = "Antibiotics", 
+                     outcome = "Asthma",
+                     shadow = TRUE,
+                     node_size = 15, 
+                     text_size = 4,  
+                     text_col = "black",
+                     stylized = TRUE) +
+    theme_dag() 
+
+```
+
+**Минимальные наборы для Asthma**:   
+{ AgeIndex, GestAge, InfSeverity, ParentAtopy, ParentEduc, WheezeHist }   
+{ AgeIndex, CareSeek, GestAge, InfSeverity, ParentEduc, WheezeHist }   
+
+ 
+Механизм связи с воздействием и исходом:      
+**AgeIndex** -     
+Возраст ребёнка при индексном эпизоде. Возраст может влиять на решение врача назначить АБ. Вероятно, маленьким детям АБ назначают чаще из-за того, что у них тяжелее протекает инфекция в связи с тем, что у них менее сформирована иммунная система по сравнению с более старшими детьми. Функция легких и риск астмы зависит от возраста (с возрастом объем легких меняется, а для развития астмы необходим триггер(аллерген), риск встретить которого увеличивается с возрастом). Если не учитывать возраст, это приведет к смещению из-за различий в возрасте      
+
+**GestAge** -        
+Гестационный возраст при рождении.      
+Недоношенность может приводить к большей предрасположенности к инфекциям или к их более тяжелому протеканию, поэтому АБ таким детям могут назначаться чаще. Также недоношенность  может быть причиной нарушения развития легких, что приводит к нарушению их функции и может способствовать развитию астмы. Неучет может привести к смещению в сторону вреда АБ        
+
+**InfSeverity** -    
+Тяжесть индексной инфекции, оценённая лечащим врачом до решения о назначении АБ в соответствии со шкалой ВОЗ IMCI. Тяжесть инфекции напрямую определяет как решение о назначении АБ, так и риск нарушения функции лёгких и астмы. Важный конфаундер, без него - сильное смещение в сторону вреда АБ (дети с тяжелым протеканием инфекции чаще получают АБ и исход болезни у них более разрушительный)    
+
+**CareSeek** или **ParentAtopy** -    
+*ParentAtopy*        
+Астма, аллергический ринит или атопический дерматит хотя бы у одного из родителей, диагностированные до рождения ребёнка. Является конфаундером. Вероятно, что здесь может сыграть генетический фактор и ребенок унаследует предрасположенность к астме и пр., что приводит к нарушению функции легких       
+*CareSeek*- (путь CareSeek -> Antibiotics) причина только для АБ        
+Склонность семьи обращаться за медицинской помощью. Не является конфаундером ни для одного из исходов, поэтому выбор набора с *ParentAtopy* более предпочтителен      
+
+**ParentEduc** -    
+Образование основного ухаживающего за ребёнком взрослого. Образование связано с условиями жизни (н-р, курение в доме), приверженностью, доступом к медицинской помощи. Конфаундер, если его не учитывать оценка будет смещенной из-за неучета социально-экономического фактора        
+
+**WheezeHist** -   
+Наличие свистящего дыхания до индексного эпизода - может быть показанием для назначения АБ, может
+приводить к нарушению функции легких и повышает риск астмы, независимо от назначения АБ. Конфаундер, если его не учитывать оценка будет смещенной в сторону вреда АБ                     
