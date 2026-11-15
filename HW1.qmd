@@ -129,3 +129,153 @@ FEV1 является следствием и назначения антиби�
 **Прочие переменные (потомок исхода)**:   
 *Referral* -следствие астмы (путь Asthma -> Referral)  
 Направление к профильному специалисту по поводу респираторных симптомов между индексным эпизодом и оценкой исходов 
+
+
+## 3. DAG, визуально отражающий роль каждой переменной в анализе данной причинно-следственной связи
+
+```{r}
+#| include: false
+library(dagitty)
+library(ggdag)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+dag <- dagitty(
+  'dag{
+AgeIndex [pos="2.682,1.201"]
+Antibiotics [exposure,pos="2.738,1.879"]
+Asthma [outcome,pos="3.033,2.033"]
+CareSeek [pos="2.951,0.880"]
+FEV1 [outcome,pos="3.240,1.773"]
+GestAge [pos="2.742,1.009"]
+InfSeverity [pos="3.266,1.357"]
+Microbiome [pos="2.861,2.023"]
+ParentAtopy [pos="2.835,0.904"]
+ParentEduc [pos="3.092,0.911"]
+Referral [pos="3.158,1.974"]
+Smoke [pos="3.208,1.062"]
+WheezeHist [pos="2.677,1.610"]
+AgeIndex -> Antibiotics
+AgeIndex -> Asthma
+AgeIndex -> FEV1
+AgeIndex -> WheezeHist
+AgeIndex -> InfSeverity
+Antibiotics -> Asthma
+Antibiotics -> FEV1
+Antibiotics -> Microbiome
+Asthma -> FEV1
+Asthma -> Referral
+CareSeek -> Antibiotics
+CareSeek -> Referral
+GestAge -> Antibiotics
+GestAge -> Asthma
+GestAge -> FEV1
+GestAge -> InfSeverity
+GestAge -> WheezeHist
+InfSeverity -> Antibiotics
+InfSeverity -> Referral
+InfSeverity -> Asthma
+InfSeverity -> FEV1
+Microbiome -> Asthma
+Microbiome -> FEV1
+ParentAtopy -> Asthma
+ParentAtopy -> CareSeek
+ParentAtopy -> FEV1
+ParentAtopy -> WheezeHist
+ParentEduc -> Antibiotics
+ParentEduc -> Asthma
+ParentEduc -> CareSeek
+ParentEduc -> FEV1
+ParentEduc -> Smoke
+Smoke -> Asthma
+Smoke -> FEV1
+Smoke -> InfSeverity
+WheezeHist -> Antibiotics
+WheezeHist -> CareSeek
+WheezeHist -> Referral
+WheezeHist -> Asthma
+WheezeHist -> FEV1
+}'
+)
+
+confounders <- c(
+  "WheezeHist",
+  "AgeIndex",
+  "GestAge",
+  "ParentAtopy",
+  "ParentEduc",
+  "Smoke",
+  "InfSeverity"
+)
+
+dag_colors <- c(
+  "Exposure" = "#228c69",
+  "Outcome" = "#c14440",
+  "Confounder" = "#ffd699",
+  "Mediator" = "#75c4f2",
+  "Collider" = "#d3a5fe",
+  "Other predictor of exposure" = "#9299A3",
+  "Other variable" = "#ead1d1"
+)
+```
+
+```{r}
+draw_dag <- function(dag, outcome_name) {
+  dag_data <- tidy_dagitty(dag)
+
+  nodes <- dag_data |>
+    distinct(name, .keep_all = TRUE) |>
+    mutate(
+      role = case_when(
+        name == "Antibiotics" ~ "Exposure",
+        name == outcome_name ~ "Outcome",
+        name %in% confounders ~ "Confounder",
+        name == "Microbiome" ~ "Mediator",
+        outcome_name == "FEV1" & name == "Asthma" ~ "Mediator",
+        outcome_name == "Asthma" & name == "FEV1" ~ "Collider",
+        name == "CareSeek" ~ "Other predictor of exposure",
+        TRUE ~ "Other variable"
+      )
+    )
+
+  p <- ggdag(dag) +
+    geom_point(
+      data = nodes,
+      aes(x = x, y = y, fill = role),
+      shape = 21,
+      size = 20
+    ) +
+
+    geom_text(
+      data = nodes,
+      aes(x = x, y = y, label = name),
+      size = 4,
+    ) +
+
+    scale_fill_manual(
+      name = "Роль",
+      values = dag_colors,
+      guide = guide_legend(
+        ncol = 3,
+        byrow = TRUE,
+        override.aes = list(size = 5)
+      )
+    ) +
+    theme_dag() +
+    theme(legend.position = "bottom") +
+    ggtitle(paste("Antibiotics ->", outcome_name))
+
+  return(p + coord_cartesian(clip = "off"))
+}
+```
+
+```{r}
+dag_asthma <- dag
+draw_dag(dag_asthma, "Asthma")
+
+
+dag_fev1 <- dag
+draw_dag(dag_fev1, "FEV1")
+```

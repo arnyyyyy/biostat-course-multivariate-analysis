@@ -26,6 +26,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -140,6 +175,220 @@ window.Quarto = {
 <li><p><span class="math inline">\(s\)</span> – стандартное отклонение <span class="math inline">\(FEV1\)</span> в литрах для этих здоровых детей</p></li>
 <li><p>Эстиманд: разность средних значений z-оценки <span class="math inline">\(FEV1\)</span> при назначении антибиотиков всем детям и неназначении антибиотиков никому из детей <span class="math display">\[E(z_{FEV1} \text{ при лечении с антибиотиками}) - E(z_{FEV1} \text{при лечении без антибиотиков})\]</span></p></li>
 </ul>
+</section>
+</section>
+<section id="задание-2" class="level1">
+<h1>Задание 2</h1>
+<p>Для каждой пары ``воздействие → исход’’ укажите роль каждой переменной на DAG в этой причинно-следственной связи (конфаундер, прокси-конфаундер, коллайдер, медиатор, прочие предикторы воздействия, прочие предикторы исхода, прочие переменные) и приведите краткое обоснование для этого.</p>
+<section id="пара-antibiotics---fev1" class="level2">
+<h2 class="anchored" data-anchor-id="пара-antibiotics---fev1">1. Пара Antibiotics -&gt; FEV1</h2>
+<p><strong>Конфаундеры</strong>: <em>WheezeHist</em> (путь WheezeHist -&gt; Antibiotics и WheezeHist -&gt; FEV1) - общая причина<br>
+Наличие свистящего дыхания до индексного эпизода - может быть показанием для назначения АБ и приводить к нарушению функции легких</p>
+<p><em>AgeIndex</em> (путь AgeIndex -&gt; Antibiotics и AgeIndex-&gt; FEV1) - общая причина<br>
+Возраст ребёнка при индексном эпизоде. Влияет на решение врача назначить АБ и на нарушение функции легких</p>
+<p><em>GestAge</em> (путь GestAge -&gt; Antibiotics и GestAge-&gt; -&gt; FEV1) - общая причина<br>
+Гестационный возраст при рождении Недоношенность может быть связана с назначениемм АБ и с нарушением функции легких</p>
+<p><em>ParentAtopy</em> (путь ParentAtopy -&gt; WheezeHist -&gt; Antibiotics и ParentAtopy -&gt; FEV1) - общая причина<br>
+Астма, аллергический ринит или атопический дерматит хотя бы у одного из родителей, диагностированные до рождения ребёнка - влияет на наличие свистящего дыхания, которое может быть показанием для назначения АБ<br>
+Напрямую влияет на нарушение функции легких</p>
+<p><em>ParentEduc</em> (путь ParentEduc -&gt; Antibiotics и ParentEduc -&gt; FEV1) - общая причина<br>
+Образование основного ухаживающего за ребёнком взрослого. Может влиять на условия жизни, приверженность к медицинскому вмешательству (назначению АБ)</p>
+<p><em>Smoke</em> (путь Smoke -&gt; InfSeverity -&gt; Antibiotics и Smoke -&gt; FEV1, InfSeverity -&gt; FEV1) - общая причина<br>
+Курение матери или кого-либо из проживающих с ребенком взрослого от рождения до индексного эпизода<br>
+Пассивное курение влияет на назначение антибиотиков опосредованно через InfSeverity, напрямую влияет на нарушение функции легких</p>
+<p><em>InfSeverity</em> (InfSeverity -&gt; Antibiotics и InfSeverity -&gt; FEV1) - общая причина<br>
+Тяжесть индексной инфекции, оценённая лечащим врачом до решения о назначении АБ в соответствии со шкалой ВОЗ IMCI<br>
+Тяжесть инфекции определяет назначение АБ и связана с риском нарушения функции легких</p>
+<p><strong>Медиаторы</strong>:<br>
+<em>Microbiome</em> (путь Antibiotics -&gt; Microbiome -&gt; FEV1)<br>
+Изменение микробиома - следствие приема АБ, которое, в свою очередь, влияет на функцию легких<br>
+<em>Asthma</em> (путь Antibiotics -&gt; Microbiome -&gt; Asthma -&gt; FEV1)<br>
+АБ могут повышать риск астмы через изменение микробиома, а астма приводит к нарушению функции легких</p>
+<p><strong>Прочие предикторы воздействия</strong>:<br>
+<em>CareSeek</em>- (путь CareSeek -&gt; Antibiotics) причина только для АБ<br>
+Склонность семьи обращаться за медицинской помощью</p>
+<p><strong>Прочие переменные (потомок воздействия)</strong>:<br>
+<em>Referral</em> -следствие только для антибиотиков (путь Antibiotics -&gt; Microbiome -&gt; Asthma -&gt; Referral)<br>
+Направление к профильному специалисту по поводу респираторных симптомов между индексным эпизодом и оценкой исходов</p>
+</section>
+<section id="пара-antibiotics---asthma" class="level2">
+<h2 class="anchored" data-anchor-id="пара-antibiotics---asthma">2. Пара Antibiotics -&gt; Asthma</h2>
+<p><strong>Конфаундеры</strong>: <em>WheezeHist</em> (путь WheezeHist -&gt; Antibiotics и WheezeHist -&gt; Asthma) - общая причина<br>
+Наличие свистящего дыхания до индексного эпизода - может быть показанием для назначения АБ и приводить к астме</p>
+<p><em>AgeIndex</em> (путь AgeIndex -&gt; Antibiotics и AgeIndex-&gt; Asthma) - общая причина<br>
+Возраст ребёнка при индексном эпизоде. Влияет на решение врача назначить АБ и на наличие астмы</p>
+<p><em>GestAge</em> (путь GestAge -&gt; Antibiotics и GestAge-&gt; -&gt; Asthma) - общая причина<br>
+Гестационный возраст при рождении<br>
+Недоношенность может быть связана с назначениемм АБ и с развитием астмы</p>
+<p><em>ParentAtopy</em> (путь ParentAtopy -&gt; WheezeHist -&gt; Antibiotics и ParentAtopy -&gt; Asthma) - общая причина<br>
+Астма, аллергический ринит или атопический дерматит хотя бы у одного из родителей, диагностированные до рождения ребёнка - влияет на наличие свистящего дыхания, которое может быть показанием для назначения АБ<br>
+Напрямую влияет на развитие астмы</p>
+<p><em>ParentEduc</em> (путь ParentEduc -&gt; Antibiotics и ParentEduc -&gt; Asthma) - общая причина<br>
+Образование основного ухаживающего за ребёнком взрослого. Может влиять на условия жизни, приверженность к медицинскому вмешательству (назначению АБ)</p>
+<p><em>Smoke</em> (путь Smoke -&gt; InfSeverity -&gt; Antibiotics и Smoke -&gt; Asthma) - общая причина<br>
+Курение матери или кого-либо из проживающих с ребенком взрослого от рождения до индексного эпизода<br>
+Пассивное курение влияет на назначение антибиотиков опосредованно через InfSeverity, напрямую влияет на развитие астмы</p>
+<p><em>InfSeverity</em> (InfSeverity -&gt; Antibiotics и InfSeverity -&gt; Asthma) - общая причина<br>
+Тяжесть индексной инфекции, оценённая лечащим врачом до решения о назначении АБ в соответствии со шкалой ВОЗ IMCI<br>
+Тяжесть инфекции определяет назначение АБ и связана с риском развития астмы</p>
+<p><strong>Медиаторы</strong>: <em>Microbiome</em> (путь Antibiotics -&gt; Microbiome -&gt; Asthma)<br>
+Изменение микробиома - следствие приема АБ, которое, в свою очередь, влияет на развитие астмы</p>
+<p><strong>Коллайдеры</strong>: <em>FEV1</em> (путь Antibiotics -&gt; FEV1 &lt;- Asthma)<br>
+FEV1 является следствием и назначения антибиотиков, и наличия астмы</p>
+<p><strong>Прочие переменные (потомок исхода)</strong>:<br>
+<em>Referral</em> -следствие астмы (путь Asthma -&gt; Referral)<br>
+Направление к профильному специалисту по поводу респираторных симптомов между индексным эпизодом и оценкой исходов</p>
+</section>
+<section id="dag-визуально-отражающий-роль-каждой-переменной-в-анализе-данной-причинно-следственной-связи" class="level2">
+<h2 class="anchored" data-anchor-id="dag-визуально-отражающий-роль-каждой-переменной-в-анализе-данной-причинно-следственной-связи">3. DAG, визуально отражающий роль каждой переменной в анализе данной причинно-следственной связи</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>dag <span class="ot">&lt;-</span> <span class="fu">dagitty</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">'dag{</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="st">AgeIndex [pos="2.682,1.201"]</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">Antibiotics [exposure,pos="2.738,1.879"]</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">Asthma [outcome,pos="3.033,2.033"]</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">CareSeek [pos="2.951,0.880"]</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">FEV1 [outcome,pos="3.240,1.773"]</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">GestAge [pos="2.742,1.009"]</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="st">InfSeverity [pos="3.266,1.357"]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="st">Microbiome [pos="2.861,2.023"]</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="st">ParentAtopy [pos="2.835,0.904"]</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">ParentEduc [pos="3.092,0.911"]</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="st">Referral [pos="3.158,1.974"]</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="st">Smoke [pos="3.208,1.062"]</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="st">WheezeHist [pos="2.677,1.610"]</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="st">AgeIndex -&gt; Antibiotics</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="st">AgeIndex -&gt; Asthma</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="st">AgeIndex -&gt; FEV1</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="st">AgeIndex -&gt; WheezeHist</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="st">AgeIndex -&gt; InfSeverity</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="st">Antibiotics -&gt; Asthma</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="st">Antibiotics -&gt; FEV1</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="st">Antibiotics -&gt; Microbiome</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="st">Asthma -&gt; FEV1</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="st">Asthma -&gt; Referral</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="st">CareSeek -&gt; Antibiotics</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="st">CareSeek -&gt; Referral</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="st">GestAge -&gt; Antibiotics</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="st">GestAge -&gt; Asthma</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="st">GestAge -&gt; FEV1</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="st">GestAge -&gt; InfSeverity</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="st">GestAge -&gt; WheezeHist</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="st">InfSeverity -&gt; Antibiotics</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="st">InfSeverity -&gt; Referral</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="st">InfSeverity -&gt; Asthma</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="st">InfSeverity -&gt; FEV1</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="st">Microbiome -&gt; Asthma</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="st">Microbiome -&gt; FEV1</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="st">ParentAtopy -&gt; Asthma</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="st">ParentAtopy -&gt; CareSeek</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="st">ParentAtopy -&gt; FEV1</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="st">ParentAtopy -&gt; WheezeHist</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="st">ParentEduc -&gt; Antibiotics</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="st">ParentEduc -&gt; Asthma</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="st">ParentEduc -&gt; CareSeek</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="st">ParentEduc -&gt; FEV1</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="st">ParentEduc -&gt; Smoke</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="st">Smoke -&gt; Asthma</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="st">Smoke -&gt; FEV1</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="st">Smoke -&gt; InfSeverity</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="st">WheezeHist -&gt; Antibiotics</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="st">WheezeHist -&gt; CareSeek</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="st">WheezeHist -&gt; Referral</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="st">WheezeHist -&gt; Asthma</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="st">WheezeHist -&gt; FEV1</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="st">}'</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>confounders <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  <span class="st">"WheezeHist"</span>,</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AgeIndex"</span>,</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="st">"GestAge"</span>,</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ParentAtopy"</span>,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ParentEduc"</span>,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Smoke"</span>,</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  <span class="st">"InfSeverity"</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>dag_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Exposure"</span> <span class="ot">=</span> <span class="st">"#228c69"</span>,</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Outcome"</span> <span class="ot">=</span> <span class="st">"#c14440"</span>,</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Confounder"</span> <span class="ot">=</span> <span class="st">"#ffd699"</span>,</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Mediator"</span> <span class="ot">=</span> <span class="st">"#75c4f2"</span>,</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Collider"</span> <span class="ot">=</span> <span class="st">"#d3a5fe"</span>,</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Other predictor of exposure"</span> <span class="ot">=</span> <span class="st">"#9299A3"</span>,</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Other variable"</span> <span class="ot">=</span> <span class="st">"#ead1d1"</span></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>draw_dag <span class="ot">&lt;-</span> <span class="cf">function</span>(dag, outcome_name) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  dag_data <span class="ot">&lt;-</span> <span class="fu">tidy_dagitty</span>(dag)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  nodes <span class="ot">&lt;-</span> dag_data <span class="sc">|&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(name, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">role =</span> <span class="fu">case_when</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> <span class="st">"Antibiotics"</span> <span class="sc">~</span> <span class="st">"Exposure"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> outcome_name <span class="sc">~</span> <span class="st">"Outcome"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">%in%</span> confounders <span class="sc">~</span> <span class="st">"Confounder"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> <span class="st">"Microbiome"</span> <span class="sc">~</span> <span class="st">"Mediator"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        outcome_name <span class="sc">==</span> <span class="st">"FEV1"</span> <span class="sc">&amp;</span> name <span class="sc">==</span> <span class="st">"Asthma"</span> <span class="sc">~</span> <span class="st">"Mediator"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        outcome_name <span class="sc">==</span> <span class="st">"Asthma"</span> <span class="sc">&amp;</span> name <span class="sc">==</span> <span class="st">"FEV1"</span> <span class="sc">~</span> <span class="st">"Collider"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        name <span class="sc">==</span> <span class="st">"CareSeek"</span> <span class="sc">~</span> <span class="st">"Other predictor of exposure"</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Other variable"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggdag</span>(dag) <span class="sc">+</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> nodes,</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">fill =</span> role),</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">shape =</span> <span class="dv">21</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">20</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> nodes,</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y, <span class="at">label =</span> name),</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">4</span>,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="st">"Роль"</span>,</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">values =</span> dag_colors,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>      <span class="at">guide =</span> <span class="fu">guide_legend</span>(</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> <span class="dv">3</span>,</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">size =</span> <span class="dv">5</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_dag</span>() <span class="sc">+</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>) <span class="sc">+</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="fu">paste</span>(<span class="st">"Antibiotics -&gt;"</span>, outcome_name))</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(p <span class="sc">+</span> <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">"off"</span>))</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dag_asthma <span class="ot">&lt;-</span> dag</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_dag</span>(dag_asthma, <span class="st">"Asthma"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HW1_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dag_fev1 <span class="ot">&lt;-</span> dag</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">draw_dag</span>(dag_fev1, <span class="st">"FEV1"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="HW1_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 </section>
 
