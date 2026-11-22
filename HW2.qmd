@@ -1,0 +1,172 @@
+---
+title: "2. Регрессионный анализ"
+
+author:
+  - name: Машукова Анастасия 
+  - name: Павловская Арина 
+  - name: Чернорыж Яна
+
+format: 
+  html:
+   embed-resources: true
+---
+
+```{r}
+#| include: false
+library(readxl)
+library(tidyverse)
+library(flextable)
+library(dplyr)
+library(gtsummary)
+library(ggplot2)
+```
+
+```{r}
+data <- read_excel("data/HW_data.xlsx")
+
+data <- data |>
+  mutate(
+    InfSeverity = factor(
+      InfSeverity,
+      levels = c(1, 2, 3),
+      labels = c("Лёгкая", "Среднетяжёлая", "Тяжёлая")
+    )
+  )
+```
+
+## 3. Правда ли, что функция легких по-разному ассоциирована с индексным возрастом у пациентов с разной тяжестью индексной инфекции
+
+#### Исследовательский вопрос
+
+Различается ли ассоциация функции легких у детей в возрасте 8 лет с индексным возрастом заболевания пациентов в зависимости от тяжести индексной инфекции
+
+
+#### Эксплораторный анализ
+```{r}
+data |>
+  group_by(InfSeverity) |>
+  summarise(
+    n = sum(!is.na(FEV1) & !is.na(AgeIndex)),
+    mean_FEV1 = mean(FEV1, na.rm = TRUE),
+    sd_FEV1 = sd(FEV1, na.rm = TRUE),
+    var_FEV1 = var(FEV1, na.rm = TRUE),
+    mean_AgeIndex = mean(AgeIndex, na.rm = TRUE),
+    sd_AgeIndex = sd(AgeIndex, na.rm = TRUE),
+    var_AgeIndex = var(AgeIndex, na.rm = TRUE)
+  ) |>
+  flextable()
+
+data_clean <- data |> filter(row_number() != 308)
+```
+
+NB: Забегая вперед
+
+При эксплораторном анализе обнаружено наблюдение 308 с экстремально низким значением FEV1, которое существенно влияло на результаты -> провели анализ без этого наблюдения. После его исключения повторно рассчитали описательные статистики и проверили гипотезу о взаимодействии с помощью F-теста:
+
+- с наблюдением 308 взаимодействие было статистически значимым (p = 0.011) 
+- без него статистическая значимость не наблюдалась (p = 0.406)
+
+```{r}
+ggplot(
+  data,
+  aes(
+    x = AgeIndex,
+    y = FEV1,
+    color = InfSeverity
+  )
+) +
+  geom_smooth(
+    formula = y ~ x,
+    se = TRUE
+  ) +
+  labs(
+    title = "Ассоциация функции лёгких с возрастом \n по тяжести индексной инфекции",
+    x = "Возраст при индексной инфекции (мес)",
+    y = "FEV1",
+    color = "Тяжесть инфекции"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(data) +
+  aes(x = InfSeverity, y = FEV1) +
+  geom_boxplot(
+    outlier.shape = "",
+  ) +
+  geom_jitter(
+    width = 0.2,
+  ) +
+  theme_minimal() +
+  labs(
+    x = "Тяжесть инфекции",
+    y = "FEV1",
+    title = "Распределение FEV1 по тяжести инфекции"
+  )
+
+ggplot(data) +
+  aes(x = InfSeverity, y = AgeIndex) +
+  geom_boxplot(outlier.shape = "") +
+  geom_jitter(width = 0.2) +
+  theme_minimal() +
+  labs(
+    x = "Тяжесть инфекции",
+    y = "Возраст при индексной инфекции (мес)",
+    title = "Распределение индексного возраста по тяжести инфекции"
+  )
+```
+
+#### Гипотезы
+
+H0 : ассоциация между функцией легких и индексным возрастом не зависит от тяжести индексной инфекции
+
+H1: ассоциация между функцией легких и индексным возрастом зависит от тяжести индексной инфекции
+
+
+#### Модели
+
+1) $$FEV1_i = \beta_0 + \beta_1 AgeIndex_i + \beta_2 (InfSeverity_i == 2) + \beta_3 (InfSeverity_i == 3) + \varepsilon_i,$$  где
+$FEV1_i$ -- функция легких у i-го пациента
+$AgeIndex_i$ -- возраст ребёнка в месяцах при индексном эпизоде
+$InfSeverity_i$ -- тяжесть индексной инфекции -- категориальный признак: 1 -- лёгкое течение, 2 -- среднетяжёлое течение, 3 -- тяжёлая инфекция
+
+2) Рассмотрим взаимодействие возраста и тяжести индексной инфекции: $AgeIndex \times InfSeverity$
+
+ $$FEV1_i = \beta_0 + \beta_1 AgeIndex_i + \beta_2 (InfSeverity_i == 2) + \beta_3 (InfSeverity_i == 3) + \beta_4 AgeIndex_i (InfSeverity_i == 2) +  \beta_5 AgeIndex_i (InfSeverity_i == 3) + \varepsilon_i,$$ 
+
+NB: $H0: \beta_4 = \beta_5 = 0$
+
+#### Проверка гипотез
+
+```{r}
+model_no_assosiation <- lm(
+  FEV1 ~ AgeIndex + InfSeverity,
+  data = data
+)
+
+model_with_assosiation <- lm(
+  FEV1 ~ AgeIndex * InfSeverity,
+  data = data
+)
+
+
+anova(model_no_assosiation, model_with_assosiation) |> flextable()
+
+model_no_assosiation_clean <- lm(
+  FEV1 ~ AgeIndex + InfSeverity,
+  data = data_clean
+)
+
+model_with_assosiation_clean <- lm(
+  FEV1 ~ AgeIndex * InfSeverity,
+  data = data_clean
+)
+
+anova(model_no_assosiation_clean, model_with_assosiation_clean) |> flextable()
+```
+
+
+#### Интерпретация результатов
+При включении всех наблюдений выявлено статистически значимое взаимодействие между индексным возрастом и тяжестью инфекции (F = 4.5452 p = 0.0111). Однако после исключения наблюдения 308 статистическая значимость взаимодействия отсутствовала (F = 0.9025 p = 0.406)
+
+Результат анализа чувствителен к одному наблюдению. После его исключения статистически значимых свидетельств того, что ассоциация между FEV1 и индексным возрастом различается в зависимости от тяжести инфекции, не обнаружено
