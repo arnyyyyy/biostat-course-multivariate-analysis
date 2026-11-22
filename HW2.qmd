@@ -2,8 +2,8 @@
 title: "2. Регрессионный анализ"
 
 author:
-  - name: Машукова Анастасия 
-  - name: Павловская Арина 
+  - name: Машукова Анастасия (1 и 2 задания)
+  - name: Павловская Арина (3 задание)
   - name: Чернорыж Яна
 
 format: 
@@ -40,19 +40,28 @@ data <- data |>
 df <- data
 ```
 Гипотеза:   
-$$H_0: \mu_1 = \mu_2 = \mu_3$$ Средние z-оценки ОФВ1 в каждой группе по тяжести индексной инфекции равны
-$$H_1: \exists\, i,j:\ \mu_i \neq \mu_j$$ Хотя бы одно из пар равенств нарушено     
+$H_0: \mu_1 = \mu_2 = \mu_3$ Средние z-оценки ОФВ1 в каждой группе по тяжести индексной инфекции равны
+
+$H_1: \exists\, i,j:\ \mu_i \neq \mu_j$ Хотя бы одно из пар равенств нарушено 
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 8
 set.seed(42)
 
-df |> ggplot(aes(x = InfSeverity, y = FEV1))+
-    geom_violin(fill = "#374E55", alpha = 0.2)+
-    geom_boxplot(width = 0.3)+
-    geom_jitter(alpha = 0.5, width = 0.1)+
-    stat_summary(fun = mean, geom = "point", shape = 23, size = 5, color = "black", fill = "#6e0c0c")+
+df |>
+    ggplot(aes(x = InfSeverity, y = FEV1)) +
+    geom_violin(fill = "#374E55", alpha = 0.2) +
+    geom_boxplot(width = 0.3) +
+    geom_jitter(alpha = 0.5, width = 0.1) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        shape = 23,
+        size = 5,
+        color = "black",
+        fill = "#6e0c0c"
+    ) +
     theme_bw()
 ```
 
@@ -82,7 +91,7 @@ InfSeverity3 - разница в среднем значении z-оценки 
 Субмодель:
 
 ```{r}
-m1_sub = lm(FEV1 ~ 1, data = df) 
+m1_sub <- lm(FEV1 ~ 1, data = df)
 m1_sub |> summary()
 ```
 Интерпретация: Отвергаем $H_0$ о том, что средняя z-оценка по выборке = 0     
@@ -103,15 +112,22 @@ $H_1$: хотя бы один коэффициент взаимодействи�
 ```{r}
 #| fig-width: 16
 #| fig-height: 8
- 
-df |> ggplot(aes(x = InfSeverity, y = FEV1))+
-    geom_violin(fill = "#374E55", alpha = 0.2) +
-    geom_boxplot(width = 0.3)+ 
-    geom_jitter(alpha = 0.5, width = 0.1) +
-    stat_summary(fun = mean, geom = "point", shape = 23, size = 5, color = "black", fill = "#6e0c0c")+
-    facet_wrap(~Smoke)+
-    theme_bw()
 
+df |>
+    ggplot(aes(x = InfSeverity, y = FEV1)) +
+    geom_violin(fill = "#374E55", alpha = 0.2) +
+    geom_boxplot(width = 0.3) +
+    geom_jitter(alpha = 0.5, width = 0.1) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        shape = 23,
+        size = 5,
+        color = "black",
+        fill = "#6e0c0c"
+    ) +
+    facet_wrap(~Smoke) +
+    theme_bw()
 ```
 Интерпретация: оба графика показывают общую тенденцию в снижении z-оценки ОФВ1 с увеличением степении тяжести инфекции. Видно, что у детей курящих родителей z-оценка ниже, чем у детей некурящих родителей.   
 В случае smoke = 0: наблюдается небольшое падение z-оценки от 1 ко 2 степени. Но при переходе от 2 к 3 происходит резкое падение, что обусловлено двумя экстремальными низкими значениями       
@@ -119,7 +135,7 @@ df |> ggplot(aes(x = InfSeverity, y = FEV1))+
 
 
 ```{r}
-m2 <- lm(FEV1 ~ InfSeverity*Smoke, data = df)
+m2 <- lm(FEV1 ~ InfSeverity * Smoke, data = df)
 m2 |> summary()
 ```
 Интерпретация:   
